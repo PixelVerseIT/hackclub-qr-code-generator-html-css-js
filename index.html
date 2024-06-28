@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator with Logo</title>
+    <title>QR Code Generator with Logo | Hayden Kong</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,10 +21,11 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             max-width: 500px;
-            width: 100%;
+            width: 90%;
         }
         h1 {
             color: #333;
+            font-size: 1.5rem;
         }
         input, select {
             width: 100%;
@@ -49,27 +50,92 @@
         }
         #qrcode {
             margin-top: 1rem;
+            max-width: 100%;
         }
         #logoPreview {
             max-width: 100px;
             max-height: 100px;
             margin-top: 1rem;
         }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .color-picker {
+            width: 48%;
+            flex-direction: column;
+        }
+        .color-picker div {
+            /* width: 48%; */
+        }
+        .color-picker label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .color-picker input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border-radius: 10px;
+        }
+        #errorMessage {
+            color: red;
+            margin-top: 1rem;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+
+        .logo-preview-div{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            background-color: #f0f0f0;
+            border: #dddddd 1px solid;
+            border-radius: 10px;
+            width: 48%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>QR Code Generator with Logo</h1>
+        <h1>Enhanced QR Code Generator with Logo</h1>
         <input type="text" id="qr-input" placeholder="Enter text or URL">
         <input type="file" id="logoInput" accept="image/*">
         <select id="logoSize">
-            <option value="0.2">Small (20% of QR Code)</option>
-            <option value="0.3" selected>Medium (30% of QR Code)</option>
-            <option value="0.4">Large (40% of QR Code)</option>
+            <option value="0.2">Small</option>
+            <option value="0.3" selected>Medium</option>
+            <option value="0.4">Large</option>
         </select>
-        <img id="logoPreview" src="" alt="Logo Preview" style="display: none;">
+        <div class="controls">
+            <div class="color-picker">
+                <div>
+                    <label for="qrColor">QR Code Color</label>
+                    <input type="color" id="qrColor" value="#000000">
+                </div>
+                <div>
+                    <label for="bgColor">Background Color</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </div>
+            <div class="logo-preview-div">
+                <p>Logo Preview:</p>
+                <img id="logoPreview" src="" alt="Logo Preview" style="display: none;">
+            </div>
+        </div>
+        
         <button onclick="generateQR()">Generate QR Code</button>
+        <button id="downloadBtn" style="display: none;" onclick="downloadQR()">Download QR Code</button>
         <canvas id="qrcode"></canvas>
+        <div id="errorMessage"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
@@ -92,41 +158,63 @@
         function generateQR() {
             const text = document.getElementById('qr-input').value;
             const logoSize = parseFloat(document.getElementById('logoSize').value);
+            const qrColor = document.getElementById('qrColor').value;
+            const bgColor = document.getElementById('bgColor').value;
             
             if (text) {
-                const qr = qrcode(0, 'H');
-                qr.addData(text);
-                qr.make();
+                try {
+                    const qr = qrcode(0, 'H');
+                    qr.addData(text);
+                    qr.make();
 
-                const canvas = document.getElementById('qrcode');
-                const size = 256;
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                const cellSize = size / qr.getModuleCount();
+                    const canvas = document.getElementById('qrcode');
+                    const size = 256;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    const cellSize = size / qr.getModuleCount();
 
-                // Draw QR code
-                for (let row = 0; row < qr.getModuleCount(); row++) {
-                    for (let col = 0; col < qr.getModuleCount(); col++) {
-                        ctx.fillStyle = qr.isDark(row, col) ? '#000000' : '#ffffff';
-                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                    // Draw QR code
+                    ctx.fillStyle = bgColor;
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.fillStyle = qrColor;
+                    for (let row = 0; row < qr.getModuleCount(); row++) {
+                        for (let col = 0; col < qr.getModuleCount(); col++) {
+                            if (qr.isDark(row, col)) {
+                                ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                            }
+                        }
                     }
-                }
 
-                // Add logo
-                if (logoImage) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const logoSizePixels = size * logoSize;
-                        const x = (size - logoSizePixels) / 2;
-                        const y = (size - logoSizePixels) / 2;
-                        ctx.drawImage(img, x, y, logoSizePixels, logoSizePixels);
+                    // Add logo
+                    if (logoImage) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const logoSizePixels = size * logoSize;
+                            const x = (size - logoSizePixels) / 2;
+                            const y = (size - logoSizePixels) / 2;
+                            ctx.drawImage(img, x, y, logoSizePixels, logoSizePixels);
+                        }
+                        img.src = logoImage;
                     }
-                    img.src = logoImage;
+
+                    document.getElementById('downloadBtn').style.display = 'inline-block';
+                    document.getElementById('errorMessage').textContent = '';
+                } catch (error) {
+                    document.getElementById('errorMessage').textContent = 'Error generating QR code. Please try again.';
                 }
             } else {
-                alert('Please enter some text or URL');
+                document.getElementById('errorMessage').textContent = 'Please enter some text or URL';
             }
+        }
+
+        function downloadQR() {
+            const canvas = document.getElementById('qrcode');
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = dataUrl;
+            link.click();
         }
     </script>
 </body>
