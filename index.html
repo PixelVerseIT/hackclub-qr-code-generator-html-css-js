@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enhanced QR Code Generator | Hayden Kong</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,11 +22,11 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        h1 {
+        h1, h2 {
             text-align: center;
             color: #2c3e50;
         }
-        input[type="text"], select {
+        input[type="text"], select, input[type="number"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -60,17 +61,20 @@
             cursor: pointer;
             font-size: 16px;
             margin-right: 10px;
+            margin-bottom: 10px;
         }
         button:hover {
             background-color: #2980b9;
         }
         .preview-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             margin-bottom: 20px;
         }
         .preview-box {
             width: 48%;
+            margin-bottom: 10px;
         }
         #logoPreview, #qrPreview {
             max-width: 100%;
@@ -101,98 +105,161 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        @media (max-width: 600px) {
-            .preview-container {
-                flex-direction: column;
-            }
-            .preview-box {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
         #copyBtn {
             background-color: #2ecc71;
         }
         #copyBtn:hover {
             background-color: #27ae60;
         }
+        @media (max-width: 600px) {
+            .preview-container {
+                flex-direction: column;
+            }
+            .preview-box {
+                width: 100%;
+            }
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+
+        .facebookl{
+            background-color: #1877F2;
+            transition: 0.2s;
+        }
+
+        .facebook:hover{
+            background-color: #2f67af;
+        }
+
+        .linkedinl{
+            background-color: #0762C8;
+            transition: 0.2s;
+        }
+
+        .linkedinl:hover{
+            background-color: #143965;
+        }
+
+        .txl{
+            background-color: black;
+            border: 1px black solid;
+            transition: 0.2s;
+        }
+
+        .txl:hover{
+            background-color: #ffffff;
+            color: black;
+            border: 1px black solid;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 style="margin-bottom: 0px;">QR Code Generator</h1>
-        <p style="text-align: center; margin-top: 0px; margin-bottom: 25px;">By Hayden Kong</p>
-        <input type="text" id="qr-input" placeholder="Enter text or URL" oninput="updatePreview()">
+        <h1>QR Code Generator</h1>
+        <p style="text-align: center; margin-top: 0; margin-bottom: 25px;">By Hayden Kong</p>
+        
+        <label for="qr-input">Text or URL</label>
+        <input type="text" id="qr-input" placeholder="Enter text or URL" aria-label="Enter text or URL for QR code" oninput="updatePreview()">
+        
         <div class="preview-container">
             <div class="preview-box">
                 <label for="logoInput">Upload Logo</label>
-                <input type="file" id="logoInput" accept="image/*">
-                <img id="logoPreview" src="" alt="Logo Preview" style="display: none; width: 130px;">
+                <input type="file" id="logoInput" accept="image/*" aria-label="Upload logo image">
+                <img id="logoPreview" src="" alt="Logo Preview" style="display: none; max-width: 130px;">
             </div>
             <div class="preview-box">
                 <label>QR Preview:</label>
-                <canvas id="qrPreview" style="width: 200px;"></canvas>
+                <canvas id="qrPreview" style="width: 200px;" aria-label="QR code preview"></canvas>
             </div>
         </div>
-        <div>
-            <label for="logoSize">Logo Size</label>
-            <select id="logoSize" onchange="updatePreview()">
-                <option value="0.2">Small</option>
-                <option value="0.3" selected>Medium</option>
-                <option value="0.4">Large</option>
-            </select>
-        </div>
-        <div>
-            <label for="errorCorrectionLevel">Correction Level</label>
-            <select id="errorCorrectionLevel" onchange="updatePreview()">
-                <option value="L">Low</option>
-                <option value="M">Medium</option>
-                <option value="Q">Quartile</option>
-                <option value="H" selected>High</option>
-            </select>
-        </div>
-        <div>
-            <label for="qrStyle">QR Style</label>
-            <select id="qrStyle" onchange="updatePreview()">
-                <option value="square" selected>Square</option>
-                <option value="dot">Dot</option>
-                <option value="rounded">Rounded</option>
-            </select>
-        </div>
+        
+        <label for="logoSize">Logo Size</label>
+        <select id="logoSize" onchange="updatePreview()">
+            <option value="0.2">Small</option>
+            <option value="0.3" selected>Medium</option>
+            <option value="0.4">Large</option>
+        </select>
+        
+        <label for="errorCorrectionLevel">Correction Level</label>
+        <select id="errorCorrectionLevel" onchange="updatePreview()">
+            <option value="L">Low</option>
+            <option value="M">Medium</option>
+            <option value="Q">Quartile</option>
+            <option value="H" selected>High</option>
+        </select>
+        
+        <label for="qrStyle">QR Style</label>
+        <select id="qrStyle" onchange="updatePreview()">
+            <option value="square" selected>Square</option>
+            <option value="dot">Dot</option>
+            <option value="rounded">Rounded</option>
+        </select>
+        
+        <label for="qrSize">QR Code Size (px)</label>
+        <input type="number" id="qrSize" value="256" min="128" max="1024" step="32" onchange="updatePreview()">
+        
         <div class="color-picker">
             <label for="qrColor">QR Code Color</label>
             <input type="color" id="qrColor" value="#000000" onchange="updatePreview()">
         </div>
+        
         <div class="color-picker">
             <label for="bgColor">Background Color</label>
             <input type="color" id="bgColor" value="#ffffff" onchange="updatePreview()">
         </div>
+        
         <div class="button-container">
-            <button onclick="generateQR()">Generate QR Code</button>
-            <button id="downloadBtn" style="display: none;" onclick="downloadQR()">Download QR Code</button>
-            <button id="copyBtn" style="display: none;" onclick="copyQR()">Copy QR Code</button>
-        </div>
-        <div style="text-align: center;">
-            <canvas id="qrcode"></canvas>
+            <button onclick="generateQR()" aria-label="Generate QR Code">Generate QR Code</button>
+            <button id="downloadBtn" style="display: none;" onclick="downloadQR()" aria-label="Download QR Code">Download QR Code</button>
+            <button id="copyBtn" style="display: none;" onclick="copyQR()" aria-label="Copy QR Code">Copy QR Code</button>
+            <button id="saveSettingsBtn" onclick="saveSettings()" aria-label="Save Current Settings">Save Settings</button>
+            <button id="loadSettingsBtn" onclick="loadSettings()" aria-label="Load Saved Settings">Load Settings</button>
         </div>
         
-        <div id="errorMessage"></div>
+        <div style="text-align: center;">
+            <canvas id="qrcode" aria-label="Generated QR Code"></canvas>
+        </div>
+        
+        <div id="errorMessage" role="alert"></div>
+        
         <div class="share-buttons" style="display: none;">
-            <button onclick="shareTwitter()">Share on Twitter</button>
-            <button onclick="shareFacebook()">Share on Facebook</button>
-            <button onclick="shareLinkedIn()">Share on LinkedIn</button>
+            <button class="facebookl" onclick="shareFacebook()" aria-label="Share on Facebook">Share on <i class="ph ph-facebook-logo" style="font-size: 1.2rem;"></i></button>
+            <button class="linkedinl" onclick="shareLinkedIn()" aria-label="Share on LinkedIn">Share on <i class="ph ph-linkedin-logo" style="font-size: 1.2rem;"></i></button>
+            <button class="txl" onclick="shareTwitter()" aria-label="Share on Twitter">Share on <i class="ph ph-x-logo" style="font-size: 1.2rem;"></i></button>
         </div>
 
-        <h2>Gallery:</h2>
-        <div class="gallery" id="gallery"></div>
+        <h2>Gallery</h2>
+        <div class="gallery" id="gallery" aria-label="Recently generated QR codes"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
     <script>
         let logoImage = null;
         let recentQRCodes = [];
 
-        // Load recent QR codes from local storage
+        document.addEventListener('DOMContentLoaded', function () {
+            loadRecentQRCodes();
+            updatePreview();
+
+            document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
+        });
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    logoImage = e.target.result;
+                    document.getElementById('logoPreview').src = logoImage;
+                    document.getElementById('logoPreview').style.display = 'inline-block';
+                    updatePreview();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
         function loadRecentQRCodes() {
             const storedQRCodes = localStorage.getItem('recentQRCodes');
             if (storedQRCodes) {
@@ -201,24 +268,9 @@
             }
         }
 
-        // Save recent QR codes to local storage
         function saveRecentQRCodes() {
             localStorage.setItem('recentQRCodes', JSON.stringify(recentQRCodes));
         }
-
-        document.getElementById('logoInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    logoImage = e.target.result;
-                    document.getElementById('logoPreview').src = logoImage;
-                    document.getElementById('logoPreview').style.display = 'inline-block';
-                    updatePreview();
-                }
-                reader.readAsDataURL(file);
-            }
-        });
 
         function updatePreview() {
             const text = document.getElementById('qr-input').value;
@@ -236,7 +288,7 @@
                 document.querySelector('.share-buttons').style.display = 'block';
                 addToGallery();
             } else {
-                document.getElementById('errorMessage').textContent = 'Please enter some text or URL';
+                showError('Please enter some text or URL');
             }
         }
 
@@ -246,14 +298,14 @@
             const bgColor = document.getElementById('bgColor').value;
             const errorCorrectionLevel = document.getElementById('errorCorrectionLevel').value;
             const qrStyle = document.getElementById('qrStyle').value;
-            
+            const size = isPreview ? 128 : parseInt(document.getElementById('qrSize').value);
+
             try {
                 const qr = qrcode(0, errorCorrectionLevel);
                 qr.addData(text);
                 qr.make();
 
                 const canvas = document.getElementById(canvasId);
-                const size = isPreview ? 128 : 256;
                 canvas.width = size;
                 canvas.height = size;
                 const ctx = canvas.getContext('2d');
@@ -274,16 +326,16 @@
                             switch (qrStyle) {
                                 case 'dot':
                                     ctx.beginPath();
-                                    ctx.arc(x + w/2, y + h/2, w/2, 0, 2 * Math.PI);
+                                    ctx.arc(x + w / 2, y + h / 2, w / 2, 0, 2 * Math.PI);
                                     ctx.fill();
                                     break;
                                 case 'rounded':
                                     ctx.beginPath();
-                                    ctx.moveTo(x + w/2, y);
-                                    ctx.arcTo(x + w, y, x + w, y + h/2, w/2);
-                                    ctx.arcTo(x + w, y + h, x + w/2, y + h, w/2);
-                                    ctx.arcTo(x, y + h, x, y + h/2, w/2);
-                                    ctx.arcTo(x, y, x + w/2, y, w/2);
+                                    ctx.moveTo(x + w / 2, y);
+                                    ctx.arcTo(x + w, y, x + w, y + h / 2, w / 2);
+                                    ctx.arcTo(x + w, y + h, x + w / 2, y + h, w / 2);
+                                    ctx.arcTo(x, y + h, x, y + h / 2, w / 2);
+                                    ctx.arcTo(x, y, x + w / 2, y, w / 2);
                                     ctx.fill();
                                     break;
                                 default:
@@ -296,7 +348,7 @@
                 // Add logo
                 if (logoImage) {
                     const img = new Image();
-                    img.onload = function() {
+                    img.onload = function () {
                         const logoSizePixels = size * logoSize;
                         const x = (size - logoSizePixels) / 2;
                         const y = (size - logoSizePixels) / 2;
@@ -305,9 +357,9 @@
                     img.src = logoImage;
                 }
 
-                document.getElementById('errorMessage').textContent = '';
+                clearError();
             } catch (error) {
-                document.getElementById('errorMessage').textContent = 'Error generating QR code. Please try again.';
+                showError('Error generating QR code. Please try again.');
             }
         }
 
@@ -353,6 +405,7 @@
             recentQRCodes.forEach((dataUrl, index) => {
                 const img = document.createElement('img');
                 img.src = dataUrl;
+                img.alt = `Recent QR Code ${index + 1}`;
                 img.onclick = () => loadFromGallery(index);
                 gallery.appendChild(img);
             });
@@ -362,7 +415,7 @@
             const canvas = document.getElementById('qrcode');
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
                 canvas.width = img.width;
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
@@ -374,20 +427,65 @@
 
         function copyQR() {
             const canvas = document.getElementById('qrcode');
-            canvas.toBlob(function(blob) {
+            canvas.toBlob(function (blob) {
                 const item = new ClipboardItem({ "image/png": blob });
-                navigator.clipboard.write([item]).then(function() {
-                    document.getElementById('copyBtn').innerHTML = 'Copied!';
-                }, function(err) {
+                navigator.clipboard.write([item]).then(function () {
+                    document.getElementById('copyBtn').innerHTML = 'Copied QR Code!';
+                    setTimeout(() => {
+                        document.getElementById('copyBtn').innerHTML = 'Copy QR Code';
+                    }, 2000);
+                }, function (err) {
                     console.error('Could not copy QR code: ', err);
-                    alert('Failed to copy QR code. Please try again.');
+                    showError('Failed to copy QR code. Please try again.');
                 });
             });
         }
 
-        // Initialize
-        loadRecentQRCodes();
-        updatePreview();
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function clearError() {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+
+        function saveSettings() {
+            const settings = {
+                logoSize: document.getElementById('logoSize').value,
+                errorCorrectionLevel: document.getElementById('errorCorrectionLevel').value,
+                qrStyle: document.getElementById('qrStyle').value,
+                qrSize: document.getElementById('qrSize').value,
+                qrColor: document.getElementById('qrColor').value,
+                bgColor: document.getElementById('bgColor').value
+            };
+            localStorage.setItem('qrSettings', JSON.stringify(settings));
+            showError('Settings saved successfully!');
+            setTimeout(clearError, 2000);
+        }
+
+        function loadSettings() {
+            const storedSettings = localStorage.getItem('qrSettings');
+            if (storedSettings) {
+                const settings = JSON.parse(storedSettings);
+                document.getElementById('logoSize').value = settings.logoSize;
+                document.getElementById('errorCorrectionLevel').value = settings.errorCorrectionLevel;
+                document.getElementById('qrStyle').value = settings.qrStyle;
+                document.getElementById('qrSize').value = settings.qrSize;
+                document.getElementById('qrColor').value = settings.qrColor;
+                document.getElementById('bgColor').value = settings.bgColor;
+                updatePreview();
+                showError('Settings loaded successfully!');
+                setTimeout(clearError, 2000);
+            } else {
+                showError('No saved settings found.');
+            }
+        }
     </script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css" integrity="sha384-BY+fdrpOd3gfeRvTSMT+VUZmA728cfF9Z2G42xpaRkUGu2i3DyzpTURDo5A6CaLK" crossorigin="anonymous">
 </body>
 </html>
